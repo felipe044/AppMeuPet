@@ -50,3 +50,4 @@ export default StyleSheet.create({
     fontWeight: '600',
   },
 });
+
