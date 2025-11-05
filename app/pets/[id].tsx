@@ -11,9 +11,6 @@ export default function PetInfo() {
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Text>{"<"}</Text>
-        </TouchableOpacity>
         <Text style={styles.headerTitle}>{nome}</Text>
         <TouchableOpacity style={styles.editButton} onPress={() => console.log("Editar pet")}>
           <Text>✏️</Text>
@@ -35,7 +32,7 @@ export default function PetInfo() {
       </View>
 
       {/* Botão flutuante para adicionar vacina */}
-      <TouchableOpacity style={styles.fab} onPress={() => console.log("Adicionar vacina")}>
+      <TouchableOpacity style={styles.fab} onPress={() => router.push(`/pets/${id}/newVaccine`)}>
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
     </View>
