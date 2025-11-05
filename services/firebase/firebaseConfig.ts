@@ -3,12 +3,12 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC9_nPimuwZ1iRWayuiAZ7lWFJMCLwPSnI",
-  authDomain: "meupetvacinado-3d96f.firebaseapp.com",
-  projectId: "meupetvacinado-3d96f",
-  storageBucket: "meupetvacinado-3d96f.firebasestorage.app",
-  messagingSenderId: "673340502361",
-  appId: "1:673340502361:web:0216ccb7eabf2af84b1c48"
+  apiKey: process.env.EXPO_PUBLIC_API_KEY,
+  authDomain: process.env.EXPO_PUBLIC_AUTH_DOMAIN,
+  projectId: process.env.EXPO_PUBLIC_PROJECT_ID,
+  storageBucket: process.env.EXPO_PUBLIC_STORAGE_BUCKET,
+  messagingSenderId: process.env.EXPO_PUBLIC_MESSAGING_SENDER_ID,
+  appId: process.env.EXPO_PUBLIC_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);
