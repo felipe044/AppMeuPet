@@ -1,10 +1,29 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image, FlatList } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import styles from "./styles/petInfo.styles";
+import { useEffect, useState } from "react";
+import { getVaccine } from "@/services/firebase/vaccineService";
+
 
 export default function PetInfo() {
   const { id, nome, raca } = useLocalSearchParams();
   const router = useRouter();
+  const [vaccines, setVaccines] = useState<any[]>([])
+
+  async function fetchVaccines() {
+    try {
+      const data = await getVaccine(id as string)
+      setVaccines(data)
+    } catch (error) {
+      console.error("Erro no serviço de busca de vacina", error);
+      return;
+    }
+  }
+
+
+  useEffect(() => {
+    fetchVaccines()
+  }, [])
 
   return (
     <View style={styles.container}>
@@ -24,12 +43,16 @@ export default function PetInfo() {
       <Text style={styles.petName}>{nome}</Text>
       <Text style={styles.petBreed}>{raca}</Text>
 
-      {/* Card de exemplo de vacina */}
-      <View style={styles.vaccineCard}>
-        <Text style={{ fontWeight: "bold" }}>Raiva</Text>
-        <Text>13 de abril de 2024</Text>
-        <Text>Próxima dose: 13 de abril de 2025</Text>
-      </View>
+      {vaccines.length > 0 ? (
+        vaccines.map((vacina) => (
+          <View style={styles.vaccineCard} key={vacina.id}>
+            <Text style={{ fontWeight: "bold" }}>{vacina.nome}</Text>
+            <Text>Aplicada em: {vacina.dataAplicada}</Text>
+            <Text>Próxima dose: {vacina.dataProxDose}</Text>
+          </View>
+        ))
+      ) : (<Text style={{ marginTop: 20 }}>Nenhuma Vacina cadastrada ainda</Text>)}
+
 
       {/* Botão flutuante para adicionar vacina */}
       <TouchableOpacity style={styles.fab} onPress={() => router.push(`/pets/${id}/newVaccine`)}>

@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import addVacine from "@/services/firebase/vaccineService";
 import styles from "./styles/newVaccine.styles";
+
 function NewVaccine() {
     const { id } = useLocalSearchParams()
     const router = useRouter()
