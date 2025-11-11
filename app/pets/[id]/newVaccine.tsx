@@ -1,11 +1,11 @@
 import { View, TextInput, TouchableOpacity, Text, Alert } from "react-native"
 import { useState, useEffect } from "react"
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
-import addVacine from "@/services/firebase/vaccineService";
+import { addVacine } from "@/services/firebase/vaccineService";
 import styles from "./styles/newVaccine.styles";
 
 function NewVaccine() {
-    const { id } = useLocalSearchParams()
+    const { id, nome, raca } = useLocalSearchParams()
     const router = useRouter()
 
     const [nomeVacina, setNomeVacina] = useState("")
@@ -17,7 +17,6 @@ function NewVaccine() {
         // Remove tudo que não for número
         value = value.replace(/\D/g, "");
 
-        // Aplica a máscara dd/mm/aaaa
         if (value.length > 4) {
             value = value.replace(/(\d{2})(\d{2})(\d+)/, "$1/$2/$3");
         } else if (value.length > 2) {
@@ -80,8 +79,7 @@ function NewVaccine() {
         <View style={styles.container}>
             <Stack.Screen options={{ headerShown: false }} />
 
-            <Text style={styles.title}>{id}</Text>
-
+            <Text style={styles.title}>{nome}</Text>
 
             <TextInput
                 style={styles.input}
