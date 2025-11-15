@@ -1,50 +1,55 @@
-# Welcome to your Expo app 👋
-
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
-
-## Get started
-
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+🐶 Meu Pet Vacinado — Aplicativo de Controle de Vacinas de Pets Aplicativo desenvolvido em React Native (Expo Router) para auxiliar tutores no controle de vacinas dos seus pets, permitindo cadastrar animais, registrar vacinas, editar informações e acompanhar o histórico de imunizações.
+Este projeto foi desenvolvido como trabalho final da disciplina de Webservices e MBaaS, utilizando conceitos práticos de:
+* Autenticação
+* CRUD completo (Pets e Vacinas)
+* Armazenamento em nuvem com Firebase
+* Navegação com Expo Router
+* Boas práticas com hooks, estados e validações
+🚀 Tecnologias Utilizadas
+* React Native (Expo)
+* Expo Router
+* TypeScript
+* Firebase Authentication
+* Firestore Database
+* Expo ImagePicker
+* Styled Components / StyleSheet
+📱 Funcionalidades do App 👤 Autenticação
+* Cadastro de usuário (Firebase Auth)
+* Login com email/senha
+* Manutenção automática do estado logado
+🐕 Módulo de Pets
+* Listar todos os pets cadastrados pelo usuário
+* Criar novo pet
+* Editar nome, raça e foto do pet
+* Atualização automática ao voltar de qualquer tela
+💉 Módulo de Vacinas
+* Adicionar vacinas por pet
+* Editar vacina já cadastrada
+Campos utilizados:
+* Nome da vacina
+* Data de aplicação
+* Próxima dose
+* Observação
+Vacinas vinculadas diretamente ao pet
+* Lista sempre atualizada ao retornar para a tela anterior
+🔄 Sincronização em Tempo Real
+* Todos os dados são armazenados no Firestore e recuperados dinamicamente
+* Cada usuário vê apenas seus próprios pets e vacinas (estruturados em /users/{uid}/pets/{petId}/vaccines/{vaccineId}) 🗂️ Arquitetura da Aplicação /app ├── login.tsx ├── register.tsx ├── pets/ │ ├── index.tsx # lista de pets │ ├── newPet.tsx # cadastro de pet │ ├── [id]/ │ ├── index.tsx # detalhes do pet │ ├── editPet.tsx # edição de pet │ ├── newVaccine.tsx │ ├── styles/ │ └── ... ├── vaccines/ │ ├── [id].tsx # editar vacina │ ├── styles/ ├── services/firebase/ │ ├── firebaseConfig.ts │ ├── petService.ts │ ├── vaccineService.ts │ ├── uploadService.ts ├── assets/ └── ...
+📦 Instalação e Execução 1️⃣ Clonar o repositório git clone https://github.com/SEU-USUARIO/meu-pet-vacinado.git cd meu-pet-vacinado 2️⃣ Instalar dependências npm install 3️⃣ Iniciar o projeto npx expo start 4️⃣ Executar no celular Baixe o Expo Go Escaneie o QR Code O app abre automaticamente
+🔥 Configuração do Firebase Crie o arquivo: /services/firebase/firebaseConfig.ts Com: export const firebaseConfig = { apiKey: "AIzaSyC9_nPimuwZ1iRWayuiAZ7lWFJMCLwPSnI", authDomain: "meupetvacinado-3d96f.firebaseapp.com", projectId: "meupetvacinado-3d96f", storageBucket: "meupetvacinado-3d96f.firebasestorage.app", messagingSenderId: "673340502361", appId: "1:673340502361:web:0216ccb7eabf2af84b1c48" }; Estrutura no Firestore: users └── {uid} └── pets └── {petId} └── vaccines └── {vaccineId}
+🧠 Conceitos trabalhados no projeto
+* Ciclo de vida com useEffect e useFocusEffect
+* Navegação dinâmica com expo-router
+* Parametrização de rotas (/pets/[id])
+* Estados controlados
+* Formulários com validação
+* Date masks
+* Comunicação com serviços externos (Firebase)
+* Organização em camadas (services / screens / styles)
+📝 Possíveis Melhorias Futuras
+* Editar foto da vacina
+* Notificações push próximas vacinas
+* Dashboard com estatísticas
+* Múltiplos tutores por pet
+* Multi-plataforma Web
+👨‍💻 Desenvolvedor Felipe Ribeiro 📄 Licença Livre para fins acadêmicos.
