@@ -36,14 +36,7 @@ Vacinas vinculadas diretamente ao pet
 * Todos os dados são armazenados no Firestore e recuperados dinamicamente
 * Cada usuário vê apenas seus próprios pets e vacinas
   (estruturados em /users/{uid}/pets/{petId}/vaccines/{vaccineId})
-  🗂️ Arquitetura da Aplicação
-  /app
-  ├── login.tsx
-   ├── register.tsx
-  ├── pets/
-  │├── index.tsx # lista de pets
-  │ ├── newPet.tsx # cadastro de pet
-  │ ├── [id]/ │ ├── index.tsx # detalhes do pet │ ├── editPet.tsx # edição de pet │ ├── newVaccine.tsx │ ├── styles/ │ └── ... ├── vaccines/ │ ├── [id].tsx # editar vacina │ ├── styles/ ├── services/firebase/ │ ├── firebaseConfig.ts │ ├── petService.ts │ ├── vaccineService.ts │ ├── uploadService.ts ├── assets/ └── ...
+
 📦 Instalação e Execução
 1️⃣ Clonar o repositório
   * git clone https://github.com/SEU-USUARIO/meu-pet-vacinado.git cd meu-pet-vacinado
