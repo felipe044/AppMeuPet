@@ -42,11 +42,6 @@ function NewVaccine() {
             Alert.alert("Campo obrigatório", "Informe a data da próxima dose")
             return false;
         }
-
-        if(dataProxDose > dataAplicada){
-            Alert.alert("A data da próxima dose não pode ser maior que a data da primeira aplicação.")
-            return false
-        }
         return true
     }
 
