@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, Image } from 'react-native';
 import { Stack } from 'expo-router';
 import styles from './styles/pets.styles';
 import { useRouter } from "expo-router"
@@ -21,7 +21,7 @@ export default function Pets() {
     loadPets();
   }, [])
 
-  
+
   return (
     <View style={styles.container}>
 
@@ -35,8 +35,13 @@ export default function Pets() {
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.card} onPress={() => router.push(
             { pathname: '/pets/[id]', params: { id: item.id, nome: item.nome, raca: item.raca } })}>
-            <Text style={styles.petName}>{item.nome}</Text>
-            <Text style={styles.petBreed}>{item.raca}</Text>
+            <View style={styles.petIconWrapper}>
+              
+            </View>
+            <View style={styles.petInfo}>
+              <Text style={styles.petName}>{item.nome}</Text>
+              <Text style={styles.petBreed}>{item.raca}</Text>
+            </View>
           </TouchableOpacity>
         )}
       />
