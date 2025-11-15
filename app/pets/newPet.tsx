@@ -54,15 +54,6 @@ function NewPet() {
                 <View style={styles.container}>
                     <Stack.Screen options={{ headerShown: false }} />
 
-                    <View style={styles.imageContainer}>
-                        <View style={styles.imageCircle}>
-                            <Text>foto do animal</Text>
-                        </View>
-                        <TouchableOpacity style={styles.addPhotoButton}>
-                            <Text style={styles.addPhotoText} >Adicionar Foto</Text>
-                        </TouchableOpacity>
-                    </View>
-
                     <Text style={styles.label} >Nome:</Text>
                     <TextInput
                         style={styles.input}
