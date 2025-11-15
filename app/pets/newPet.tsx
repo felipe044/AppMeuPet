@@ -1,10 +1,10 @@
-import { Alert, TextInput, TouchableOpacity } from "react-native";
+import { Alert, TextInput, TouchableOpacity, KeyboardAvoidingView, ScrollView, Platform } from "react-native";
 import { View, Text } from "react-native";
 import { Stack, useRouter } from 'expo-router';
 import styles from './styles/newPet.styles';
 import { addPet } from "@/services/firebase/petService";
 import { useState } from "react";
-import { getPet } from "@/services/firebase/petService";
+import { getPetByName } from "@/services/firebase/petService";
 
 function NewPet() {
     const [nome, setNome] = useState("")
@@ -27,22 +27,8 @@ function NewPet() {
         if (!validateFields()) {
             return;
         }
-        const existingPet = await getPet(nome, raca);
-        if (existingPet) {
-            Alert.alert(
-                "Pet já cadastrado",
-                "Já existe um pet com esse nome e raça. Deseja salvar mesmo assim?",
-                [
-                    { text: "Cancelar", style: "cancel", onPress: ()=>{setNome(''); setRaca('');} },
-                    
-                    {
-                        text: "Continuar",
-                        onPress: () => savePet()
-                    }
-                ]
-            );
-            return;
-        }
+        const existingPet = await getPetByName(nome);
+
 
         savePet();
     }
@@ -51,45 +37,55 @@ function NewPet() {
         try {
             await addPet({ nome, raca });
             Alert.alert("Sucesso", "Pet cadastrado com sucesso!");
-            router.push("/pets"); 
+            router.push("/pets");
         } catch (error) {
             console.log("Erro ao tentar salvar pet", error);
         }
     }
     return (
-        <View style={styles.container}>
-            <Stack.Screen options={{ headerShown: false }} />
-
-            <View style={styles.imageContainer}>
-                <View style={styles.imageCircle}>
-                    <Text>foto do animal</Text>
-                </View>
-                <TouchableOpacity style={styles.addPhotoButton}>
-                    <Text style={styles.addPhotoText} >Adicionar Foto</Text>
-                </TouchableOpacity>
-            </View>
-
-            <Text style={styles.label} >Nome:</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Digite o nome do animal"
-                value={nome}
-                onChangeText={setNome}
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+            <ScrollView
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: 30 }}
+                keyboardShouldPersistTaps="handled"
             >
-            </TextInput>
+                <View style={styles.container}>
+                    <Stack.Screen options={{ headerShown: false }} />
 
-            <Text style={styles.label}>Raça:</Text>
-            <TextInput
-                style={styles.input}
-                placeholder="Digite a raça do animal"
-                value={raca}
-                onChangeText={setRaca}
-            ></TextInput>
+                    <View style={styles.imageContainer}>
+                        <View style={styles.imageCircle}>
+                            <Text>foto do animal</Text>
+                        </View>
+                        <TouchableOpacity style={styles.addPhotoButton}>
+                            <Text style={styles.addPhotoText} >Adicionar Foto</Text>
+                        </TouchableOpacity>
+                    </View>
 
-            <TouchableOpacity style={styles.saveButton} onPress={validatePet}>
-                <Text style={styles.saveButtonText} >Salvar</Text>
-            </TouchableOpacity>
-        </View>
+                    <Text style={styles.label} >Nome:</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Digite o nome do animal"
+                        value={nome}
+                        onChangeText={setNome}
+                    >
+                    </TextInput>
+
+                    <Text style={styles.label}>Raça:</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Digite a raça do animal"
+                        value={raca}
+                        onChangeText={setRaca}
+                    ></TextInput>
+
+                    <TouchableOpacity style={styles.saveButton} onPress={validatePet}>
+                        <Text style={styles.saveButtonText} >Salvar</Text>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     )
 }
 

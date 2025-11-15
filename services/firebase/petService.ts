@@ -1,39 +1,85 @@
-import { addDoc, collection, getDocs, getDoc, query, where, doc, updateDoc  } from "firebase/firestore";
-import { db } from "./firebaseConfig";
+import { db, auth } from "./firebaseConfig";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  getDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
+import { query, where } from "firebase/firestore";
 
-/** ✅ Buscar todos os pets */
-export async function getAllPets() {
-  const petsRef = collection(db, "pets");
+// 📌 Helper: retorna a referência da coleção de pets do usuário
+function petsCollection() {
+  const userId = auth.currentUser?.uid;
+  if (!userId) throw new Error("Usuário não autenticado");
+  return collection(db, "users", userId, "pets");
+}
+
+// 📌 Helper: retorna o documento de um pet específico do usuário
+function petDoc(petId: string) {
+  const userId = auth.currentUser?.uid;
+  if (!userId) throw new Error("Usuário não autenticado");
+  return doc(db, "users", userId, "pets", petId);
+}
+
+// --------------------------------------------------------------------
+
+export async function addPet(data: {
+  nome: string;
+  raca: string;
+  fotoUri?: string | null;
+}) {
+  const colRef = petsCollection();
+  const created = await addDoc(colRef, {
+    nome: data.nome,
+    nomeNormalizado: data.nome.toLowerCase(),
+    raca: data.raca,
+    racaNormalizada: data.raca.toLowerCase(),
+    fotoUri: data.fotoUri || null,
+    criadoEm: new Date(),
+  });
+
+  return created.id;
+}
+
+
+export async function getPets() {
+  const userId = auth.currentUser?.uid;
+  if (!userId) throw new Error("Usuário não autenticado");
+
+  const petsRef = collection(db, "users", userId, "pets");
   const snapshot = await getDocs(petsRef);
 
-  return snapshot.docs.map(doc => ({
+  return snapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
   }));
 }
 
-export async function addPet(petData: { nome: string; raca: string }) {
-  const petsRef = collection(db, "pets");
 
-  const newPet = {
-    nome: petData.nome,
-    raca: petData.raca,
-    nomeNormalizado: petData.nome.trim().toLowerCase(),
-    racaNormalizada: petData.raca.trim().toLowerCase(),
-  };
-
-  const docRef = await addDoc(petsRef, newPet);
-  return docRef.id;
+export async function updatePet(petId: string, data: any) {
+  const docRef = petDoc(petId);
+  await updateDoc(docRef, data);
+  return true;
 }
 
-export async function getPet(nome: string, raca: string) {
-  const petsRef = collection(db, "pets");
+export async function deletePet(petId: string) {
+  const docRef = petDoc(petId);
+  await deleteDoc(docRef);
+  return true;
 
-  const q = query(
-    petsRef,
-    where("nomeNormalizado", "==", nome.trim().toLowerCase()),
-    where("racaNormalizada", "==", raca.trim().toLowerCase())
-  );
+  
+}
+
+
+export async function getPetByName(nome: string) {
+  const userId = auth.currentUser?.uid;
+  if (!userId) throw new Error("Usuário não autenticado");
+
+  const petsRef = collection(db, "users", userId, "pets");
+  const q = query(petsRef, where("nomeNormalizado", "==", nome.toLowerCase()));
 
   const snapshot = await getDocs(q);
 
@@ -45,28 +91,58 @@ export async function getPet(nome: string, raca: string) {
   };
 }
 
-export async function getPetPhoto(petId: string) {
-  try {
-    const petRef = doc(db, "pets", petId);
-    const snap = await getDoc(petRef);
+export type Pet = {
+  id: string;
+  nome: string;
+  raca: string;
+  nomeNormalizado?: string;
+  racaNormalizado?: string;
+  image?: string;
+};
 
-    if (snap.exists()) {
-      const data = snap.data();
-      return data.imageUrl || null;   // <<--- AQUI
-    } else {
+export async function getPetById(id: string): Promise<Pet | null> {
+  try {
+    const user = auth.currentUser;
+
+    // 1) tenta em /users/{uid}/pets/{id}
+    if (user) {
+      const userPetRef = doc(db, "users", user.uid, "pets", id);
+      const userPetSnap = await getDoc(userPetRef);
+
+      if (userPetSnap.exists()) {
+        const data = userPetSnap.data() as any;
+        return {
+          id: userPetSnap.id,
+          nome: data.nome ?? "",
+          raca: data.raca ?? "",
+          nomeNormalizado: data.nomeNormalizado,
+          racaNormalizado: data.racaNormalizado,
+          image: data.image,
+        };
+      }
+    }
+
+    // 2) fallback em /pets/{id}
+    const petRef = doc(db, "pets", id);
+    const petSnap = await getDoc(petRef);
+
+    if (!petSnap.exists()) {
+      console.warn("Pet não encontrado no Firestore para id:", id);
       return null;
     }
+
+    const data = petSnap.data() as any;
+
+    return {
+      id: petSnap.id,
+      nome: data.nome ?? "",
+      raca: data.raca ?? "",
+      nomeNormalizado: data.nomeNormalizado,
+      racaNormalizado: data.racaNormalizado,
+      image: data.image,
+    };
   } catch (error) {
-    console.error("Erro ao carregar foto:", error);
-    return null;
+    console.error("Erro ao buscar pet:", error);
+    throw error;
   }
-}
-
-
-export async function updatePetImage(petId: string, imageUrl: string) {
-  const petRef = doc(db, "pets", petId);
-
-  await updateDoc(petRef, {
-    imageUrl,
-  });
 }

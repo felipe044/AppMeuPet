@@ -51,6 +51,12 @@ const styles = StyleSheet.create({
     color: '#2F80ED',
     fontWeight: 'bold',
   },
+   label: {
+    fontSize: 14,
+    fontWeight: '500',
+    paddingLeft: 10
+
+  },
 });
 
 export default styles;

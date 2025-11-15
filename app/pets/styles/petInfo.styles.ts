@@ -14,6 +14,7 @@ export default StyleSheet.create({
     justifyContent: "center", // Título centralizado
     position: "relative",
     marginBottom: 10,
+    paddingTop: 60,
   },
 
   headerTitle: {

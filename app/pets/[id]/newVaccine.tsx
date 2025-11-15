@@ -1,7 +1,7 @@
-import { View, TextInput, TouchableOpacity, Text, Alert } from "react-native"
+import { View, TextInput, TouchableOpacity, Text, Alert, KeyboardAvoidingView, ScrollView, Platform } from "react-native"
 import { useState, useEffect } from "react"
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
-import { addVacine } from "@/services/firebase/vaccineService";
+import { addVaccine } from "@/services/firebase/vaccineService";
 import styles from "./styles/newVaccine.styles";
 
 function NewVaccine() {
@@ -17,15 +17,19 @@ function NewVaccine() {
         // Remove tudo que não for número
         value = value.replace(/\D/g, "");
 
-        if (value.length > 4) {
-            value = value.replace(/(\d{2})(\d{2})(\d+)/, "$1/$2/$3");
-        } else if (value.length > 2) {
-            value = value.replace(/(\d{2})(\d+)/, "$1/$2");
+        // Limita a 8 números (DDMMAAAA)
+        if (value.length > 8) value = value.slice(0, 8);
+
+        if (value.length >= 5) {
+            // DD/MM/AAAA
+            value = value.replace(/(\d{2})(\d{2})(\d{1,4})/, "$1/$2/$3");
+        } else if (value.length >= 3) {
+            // DD/MM
+            value = value.replace(/(\d{2})(\d{1,2})/, "$1/$2");
         }
 
         return value;
     }
-
 
     function validateFields() {
         if (!nomeVacina) {
@@ -37,6 +41,11 @@ function NewVaccine() {
         } else if (!dataProxDose) {
             Alert.alert("Campo obrigatório", "Informe a data da próxima dose")
             return false;
+        }
+
+        if(dataProxDose > dataAplicada){
+            Alert.alert("A data da próxima dose não pode ser maior que a data da primeira aplicação.")
+            return false
         }
         return true
     }
@@ -56,7 +65,7 @@ function NewVaccine() {
         try {
             console.log("ID do pet:", id);
             console.log("Dados enviados:", dataVaccine);
-            const docId = await addVacine(id as string, dataVaccine);
+            const docId = await addVaccine(id as string, dataVaccine);
             console.log("ID da vacina criada:", docId);
 
             Alert.alert("Sucesso", "Vacina cadastrada!");
@@ -76,45 +85,61 @@ function NewVaccine() {
     }, [])
 
     return (
-        <View style={styles.container}>
-            <Stack.Screen options={{ headerShown: false }} />
+        <KeyboardAvoidingView
+            style={{ flex: 1 }}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+            <ScrollView
+                contentContainerStyle={{ flexGrow: 1, paddingBottom: 30 }}
+                keyboardShouldPersistTaps="handled"
+            >
 
-            <Text style={styles.title}>{nome}</Text>
+                <View style={styles.container}>
+                    <Stack.Screen options={{ headerShown: false }} />
 
-            <TextInput
-                style={styles.input}
-                placeholder="Nome da vacina"
-                value={nomeVacina}
-                onChangeText={setNomeVacina}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Data aplicada"
-                value={dataAplicada}
-                keyboardType="numeric"
-                maxLength={10}
-                onChangeText={(text) => setDataAplicada(formatDate(text))}
-            />
-            <TextInput
-                style={styles.input}
-                placeholder="Próxima dose"
-                value={dataProxDose}
-                keyboardType="numeric"
-                maxLength={10}
-                onChangeText={(text) => setDataProxDose(formatDate(text))}
-            />
-            <TextInput
-                style={styles.textArea}
-                placeholder="Observações (opcional)"
-                value={obs}
-                onChangeText={setObs}
-                multiline
-            />
+                    <Text style={styles.title}>{nome}</Text>
 
-            <TouchableOpacity style={styles.button} onPress={saveVaccine}>
-                <Text style={styles.buttonText}>Salvar</Text>
-            </TouchableOpacity>
-        </View>
+                    <Text style={styles.label}>Nome da vacina:</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={nomeVacina}
+                        onChangeText={setNomeVacina}
+                    />
+
+                    <Text style={styles.label} >Data da Aplicação:</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={dataAplicada}
+                        keyboardType="numeric"
+                        maxLength={10}
+                        onChangeText={(text) => setDataAplicada(formatDate(text))}
+                        placeholder="DD/MM/AAAA"
+                    />
+
+                    <Text style={styles.label}>Próxima dose</Text>
+                    <TextInput
+                        style={styles.input}
+                        value={dataProxDose}
+                        keyboardType="numeric"
+                        maxLength={10}
+                        onChangeText={(text) => setDataProxDose(formatDate(text))}
+                    />
+
+                    <Text style={styles.label}>Observação</Text>
+                    <TextInput
+                        style={styles.textArea}
+                        placeholder="Observações (opcional)"
+                        value={obs}
+                        onChangeText={setObs}
+                        multiline
+                    />
+
+                    <TouchableOpacity style={styles.button} onPress={saveVaccine}>
+                        <Text style={styles.buttonText}>Salvar</Text>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 

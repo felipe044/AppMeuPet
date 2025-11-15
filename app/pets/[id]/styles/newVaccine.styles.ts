@@ -46,4 +46,12 @@ export default StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+    label: {
+    fontSize: 14,
+    fontWeight: '500',
+    marginLeft: 10
+    //marginTop: 20,
+    //marginBottom: 6,
+  },
+
 });

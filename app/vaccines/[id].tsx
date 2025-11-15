@@ -1,30 +1,80 @@
-import { View, Text, TextInput, TouchableOpacity } from "react-native";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import styles from "./styles/editVaccine";
+import { updateVaccine } from "@/services/firebase/vaccineService";
 
 type VaccineParams = {
-  id: string;
+  id: string; 
+  petId: string;
   nome: string;
-  dataaplicada: string;
-  dataprox: string;
+  dataAplicada: string;
+  dataProxDose: string;
   obs: string;
 };
 
 export default function EditVaccine() {
-  const { id, nome, dataaplicada, dataprox, obs } = useLocalSearchParams<VaccineParams>();
+  const router = useRouter();
+  const { id, petId, nome, dataAplicada, dataProxDose, obs } = useLocalSearchParams<VaccineParams>();
+  console.log("PARAMS RECEBIDOS:", useLocalSearchParams());
 
   const [novoNome, setNovoNome] = useState(nome || "");
-  const [novaDataAplicada, setNovaDataAplicada] = useState(dataaplicada || "");
-  const [novaProxDose, setNovaProxDose] = useState(dataprox || "");
+  const [novaDataAplicada, setNovaDataAplicada] = useState(dataAplicada || "");
+  const [novaProxDose, setNovaProxDose] = useState(dataProxDose || "");
   const [novaObs, setNovaObs] = useState(obs || "");
 
+  function formatDate(value: string) {
+    // Remove tudo que não for número
+    value = value.replace(/\D/g, "");
 
-  async function saveModifyVaccine(){
+    if (value.length > 4) {
+      value = value.replace(/(\d{2})(\d{2})(\d+)/, "$1/$2/$3");
+    } else if (value.length > 2) {
+      value = value.replace(/(\d{2})(\d+)/, "$1/$2");
+    }
 
+    return value;
   }
 
- return (
+  function validateFields() {
+    if (!novoNome) {
+      Alert.alert("Campo obrigatório", "Informe o nome da vacina.");
+      return false;
+    }
+    if (!novaDataAplicada) {
+      Alert.alert("Campo obrigatório", "Informe a data da aplicação.");
+      return false;
+    }
+    if (!novaProxDose) {
+      Alert.alert("Campo obrigatório", "Informe a data da próxima dose.");
+      return false;
+    }
+    return true;
+  }
+
+  
+
+  async function saveModifyVaccine() {
+
+    if (!validateFields()) {
+      return;
+    }
+    try {
+      await updateVaccine(petId as string, id as string, {
+        nome: novoNome,
+        dataAplicada: novaDataAplicada,
+        dataProxDose: novaProxDose,
+        obs: novaObs,
+      });
+
+      alert("Vacina atualizada!");
+      router.back();
+    } catch (error) {
+      console.log("Erro ao atualizar vacina:", error);
+    }
+  }
+
+  return (
     <View style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
 
@@ -42,16 +92,17 @@ export default function EditVaccine() {
       <TextInput
         style={styles.input}
         value={novaDataAplicada}
-        onChangeText={setNovaDataAplicada}
+        //onChangeText={setNovaDataAplicada}
         placeholder="DD/MM/AAAA"
+        onChangeText={(text) => setNovaDataAplicada(formatDate(text))}
       />
 
       <Text style={styles.label}>Próxima Dose</Text>
       <TextInput
         style={styles.input}
         value={novaProxDose}
-        onChangeText={setNovaProxDose}
         placeholder="DD/MM/AAAA"
+        onChangeText={(text) => setNovaProxDose(formatDate(text))}
       />
 
       <Text style={styles.label}>Observações</Text>
@@ -63,7 +114,7 @@ export default function EditVaccine() {
         multiline
       />
 
-      <TouchableOpacity style={styles.saveButton}>
+      <TouchableOpacity style={styles.saveButton} onPress={saveModifyVaccine}>
         <Text style={styles.saveButtonText}>Salvar Alterações</Text>
       </TouchableOpacity>
     </View>
